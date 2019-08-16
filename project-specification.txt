@@ -1,0 +1,49 @@
+{
+  prefix [com seanshubin]
+  name [factor analysis]
+  description 'Factor Analysis'
+  version 1.0-SNAPSHOT
+  language kotlin
+  developer {
+    name 'Sean Shubin'
+    githubName SeanShubin
+    mavenUserName SeanShubin
+    organization 'Sean Shubin'
+    url http://seanshubin.com/
+  }
+  dependencies {
+    stdlib {
+      group org.jetbrains.kotlin
+      artifact kotlin-stdlib-jdk8
+    }
+    coroutines {
+      group org.jetbrains.kotlinx
+      artifact kotlinx-coroutines-core
+    }
+    test {
+      group org.jetbrains.kotlin
+      artifact kotlin-test-junit
+      scope test
+    }
+    arrow {
+        group    io.arrow-kt
+        artifact arrow-core
+    }
+    jackson {
+        group com.fasterxml.jackson.module
+        artifact jackson-module-kotlin
+    }
+    jackson-time {
+        group com.fasterxml.jackson.datatype
+        artifact jackson-datatype-jsr310
+    }
+  }
+  global [ stdlib test ]
+  modules {
+    contract        []
+    domain          [contract]
+  }
+  detangler [detangler]
+  javaVersion 12
+  deployableToMavenCentral true
+}
