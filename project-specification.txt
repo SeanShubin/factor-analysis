@@ -41,7 +41,8 @@
   global [ stdlib test ]
   modules {
     contract        []
-    domain          [contract]
+    matrix          []
+    domain          [contract matrix]
   }
   detangler [detangler]
   javaVersion 12
