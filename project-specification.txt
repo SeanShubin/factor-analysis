@@ -40,9 +40,10 @@
   }
   global [ stdlib test ]
   modules {
-    contract        []
     domain          [ contract matrix ]
-    matrix          []
+    contract        []
+    matrix          [ format ]
+    format          []
   }
   detangler [detangler]
   javaVersion 12

@@ -53,10 +53,10 @@
         </dependencies>
     </dependencyManagement>
     <modules>
+        <module>domain</module>
         <module>contract</module>
         <module>matrix</module>
-        <module>domain</module>
-        <module>matrix</module>
+        <module>format</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
