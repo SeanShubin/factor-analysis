@@ -72,4 +72,3 @@ data class Matrix<T>(val rows: List<List<T>>, val size: Size) {
         fun <T> col(vararg cells: T): Matrix<T> = row(*cells).transpose()
     }
 }
-
