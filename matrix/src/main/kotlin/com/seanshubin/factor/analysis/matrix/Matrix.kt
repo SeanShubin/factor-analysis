@@ -9,6 +9,7 @@ interface Matrix {
     fun addRow(vararg cells: Double): Matrix
     fun addColumn(vararg cells: Double): Matrix
     fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix
+    fun crossOperation(that: Matrix, operation1: (Double, Double) -> Double, operation2: (Double, Double) -> Double): Matrix
 
     fun toList(): List<Double> {
         val list = mutableListOf<Double>()
@@ -35,4 +36,7 @@ interface Matrix {
     fun addRow(vararg cells: Int): Matrix = addRow(*cells.map { it.toDouble() }.toDoubleArray())
     fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toDouble() }.toDoubleArray())
     operator fun plus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a + b }
+    operator fun times(that:Matrix):Matrix = crossOperation(that, {a, b -> a + b}, {a, b -> a * b})
+    fun getRow(rowIndex:Int):List<Double> = (0 until columnCount).map { this[rowIndex, it] }
+    fun getColumn(columnIndex:Int):List<Double> = (0 until rowCount).map{this[it,columnIndex]}
 }

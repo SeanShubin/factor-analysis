@@ -44,6 +44,34 @@ class ListMatrix(private val rows: List<List<Double>>) : Matrix {
         return result
     }
 
+    override fun crossOperation(that: Matrix, operation1: (Double, Double) -> Double, operation2: (Double, Double) -> Double): Matrix {
+        if(columnCount != that.rowCount) {
+            throw RuntimeException(
+                """Column count ($columnCount) of this matrix does not match the row count (${that.rowCount} of that matrix)
+                    |this matrix
+                    |$this
+                    |that matrix
+                    |$that
+                """.trimMargin()
+            )
+        }
+        val rows = (0 until rowCount).map { rowIndex ->
+            (0 until that.columnCount).map { columnIndex ->
+                val row = getRow(rowIndex)
+                val column = that.getColumn(columnIndex)
+                dotProduct(row, column, operation1, operation2)
+            }
+        }
+        return ListMatrix(rows)
+    }
+
+    private fun dotProduct(listA:List<Double>,
+                           listB:List<Double>,
+                           operation1: (Double, Double) -> Double,
+                           operation2: (Double, Double) -> Double):Double {
+        return listA.zip(listB).map { (a,b )-> operation2(a,b)}.fold(0.0, operation1)
+    }
+
     override fun toString(): String = toLines().joinToString("\n")
     override fun equals(other: Any?): Boolean =
         when (other) {
