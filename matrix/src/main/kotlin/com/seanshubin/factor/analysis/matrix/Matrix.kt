@@ -8,6 +8,7 @@ interface Matrix {
     operator fun get(i: Int, j: Int): Double
     fun addRow(vararg cells: Double): Matrix
     fun addColumn(vararg cells: Double): Matrix
+    fun replaceRow(rowIndex:Int, cells:List<Double>):Matrix
     fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix
     fun crossOperation(that: Matrix, operation1: (Double, Double) -> Double, operation2: (Double, Double) -> Double): Matrix
 
@@ -39,4 +40,22 @@ interface Matrix {
     operator fun times(that:Matrix):Matrix = crossOperation(that, {a, b -> a + b}, {a, b -> a * b})
     fun getRow(rowIndex:Int):List<Double> = (0 until columnCount).map { this[rowIndex, it] }
     fun getColumn(columnIndex:Int):List<Double> = (0 until rowCount).map{this[it,columnIndex]}
+    fun multiplyRowBy(rowIndex:Int, x:Double):Matrix {
+        val newRow = (0 until columnCount).map{this[rowIndex, it] * x}.map(::noNegativeZero)
+        return replaceRow(rowIndex, newRow)
+    }
+    fun multiplyRowBy(rowIndex:Int, x:Int):Matrix = multiplyRowBy(rowIndex, x.toDouble())
+    fun divideRowBy(rowIndex:Int, x:Double):Matrix = multiplyRowBy(rowIndex, 1/x)
+    fun divideRowBy(rowIndex:Int, x:Int):Matrix = divideRowBy(rowIndex, x.toDouble())
+    fun addMultipleOfRow(targetRowIndex:Int, sourceRowIndex:Int, multiple:Double):Matrix {
+        val newRow = (0 until columnCount).map{this[targetRowIndex, it] + multiple * this[sourceRowIndex, it]}.map(::noNegativeZero)
+        return replaceRow(targetRowIndex, newRow)
+    }
+    fun addMultipleOfRow(targetRowIndex:Int, sourceRowIndex:Int, multiple:Int):Matrix =
+        addMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toDouble())
+    fun subtractMultipleOfRow(targetRowIndex:Int, sourceRowIndex:Int, multiple:Double):Matrix =
+        addMultipleOfRow(targetRowIndex, sourceRowIndex, -multiple)
+    fun subtractMultipleOfRow(targetRowIndex:Int, sourceRowIndex:Int, multiple:Int):Matrix =
+        subtractMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toDouble())
+    private fun noNegativeZero(x:Double):Double = if(x == -0.0) 0.0 else x
 }

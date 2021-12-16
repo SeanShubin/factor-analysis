@@ -65,6 +65,10 @@ class ListMatrix(private val rows: List<List<Double>>) : Matrix {
         return ListMatrix(rows)
     }
 
+    override fun replaceRow(rowIndex: Int, cells: List<Double>): Matrix {
+        return ListMatrix(rows.take(rowIndex) + listOf(cells) + rows.drop(rowIndex+1))
+    }
+
     private fun dotProduct(listA:List<Double>,
                            listB:List<Double>,
                            operation1: (Double, Double) -> Double,
