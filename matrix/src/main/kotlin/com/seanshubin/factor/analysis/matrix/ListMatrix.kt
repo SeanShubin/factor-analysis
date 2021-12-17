@@ -38,6 +38,12 @@ class ListMatrix(private val rows: List<List<Double>>) : Matrix {
         return ListMatrix(baseRows.zip(cells.toList()).map(::appendCell))
     }
 
+    override fun swapRows(rowIndexA: Int, rowIndexB: Int): Matrix {
+        val rowA = rows[rowIndexA]
+        val rowB = rows[rowIndexB]
+        return replaceRow(rowIndexA, rowB).replaceRow(rowIndexB, rowA)
+    }
+
     override fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix {
         val cells: List<Double> = toList().zip(that.toList()).map { (a, b) -> operation(a, b) }
         val result = constructor(cells, columnCount)

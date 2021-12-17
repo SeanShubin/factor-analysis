@@ -9,6 +9,7 @@ interface Matrix {
     fun addRow(vararg cells: Double): Matrix
     fun addColumn(vararg cells: Double): Matrix
     fun replaceRow(rowIndex:Int, cells:List<Double>):Matrix
+    fun swapRows(rowIndexA:Int, rowIndexB:Int):Matrix
     fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix
     fun crossOperation(that: Matrix, operation1: (Double, Double) -> Double, operation2: (Double, Double) -> Double): Matrix
 
@@ -57,5 +58,24 @@ interface Matrix {
         addMultipleOfRow(targetRowIndex, sourceRowIndex, -multiple)
     fun subtractMultipleOfRow(targetRowIndex:Int, sourceRowIndex:Int, multiple:Int):Matrix =
         subtractMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toDouble())
+    fun reducedRowEchelonForm():Matrix {
+        var newMatrix = this
+        while(newMatrix.zeroAboveNonZero()){
+            newMatrix = newMatrix.fixZeroAboveNonZero()
+        }
+        return newMatrix
+    }
     private fun noNegativeZero(x:Double):Double = if(x == -0.0) 0.0 else x
+    private fun zeroAboveNonZero():Boolean {
+        val firstColumn = getColumn(0)
+        val indexOfFirstZero = firstColumn.indexOfFirst { it == 0.0 }
+        val indexOfFirstNonZero = firstColumn.indexOfFirst { it != 0.0 }
+        return indexOfFirstZero < indexOfFirstNonZero
+    }
+    private fun fixZeroAboveNonZero():Matrix {
+        val firstColumn = getColumn(0)
+        val indexOfFirstZero = firstColumn.indexOfFirst { it == 0.0 }
+        val indexOfFirstNonZero = firstColumn.indexOfFirst { it != 0.0 }
+        return swapRows(indexOfFirstZero, indexOfFirstNonZero)
+    }
 }
