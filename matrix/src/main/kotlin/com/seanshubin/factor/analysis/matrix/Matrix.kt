@@ -107,25 +107,5 @@ interface Matrix {
         val resultIndex = (rowIndex until rowCount).indexOfFirst { this[it, columnIndex] != 0.0 }
         return if(resultIndex == -1) null else resultIndex + rowIndex
     }
-    fun subMatrix(startingRowIndex:Int, startingColumnIndex:Int):Matrix{
-        val rows:List<List<Double>> = (startingRowIndex until rowCount).map { rowIndex ->
-            (startingColumnIndex until columnCount).map{ columnIndex ->
-                this[rowIndex, columnIndex]
-            }
-        }
-        return fromRows(rows)
-    }
     private fun noNegativeZero(x:Double):Double = if(x == -0.0) 0.0 else x
-    private fun zeroAboveNonZero():Boolean {
-        val firstColumn = getColumn(0)
-        val indexOfFirstZero = firstColumn.indexOfFirst { it == 0.0 }
-        val indexOfFirstNonZero = firstColumn.indexOfFirst { it != 0.0 }
-        return indexOfFirstZero < indexOfFirstNonZero
-    }
-    private fun fixZeroAboveNonZero():Matrix {
-        val firstColumn = getColumn(0)
-        val indexOfFirstZero = firstColumn.indexOfFirst { it == 0.0 }
-        val indexOfFirstNonZero = firstColumn.indexOfFirst { it != 0.0 }
-        return swapRows(indexOfFirstZero, indexOfFirstNonZero)
-    }
 }
