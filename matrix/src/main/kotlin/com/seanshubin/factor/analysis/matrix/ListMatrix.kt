@@ -1,6 +1,6 @@
 package com.seanshubin.factor.analysis.matrix
 
-class ListMatrix(private val rows: List<List<Double>>) : Matrix {
+class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
     companion object {
         val empty: Matrix = ListMatrix(emptyList())
     }
@@ -8,6 +8,8 @@ class ListMatrix(private val rows: List<List<Double>>) : Matrix {
     init {
         requireAllRowsSameSize()
     }
+
+    override fun fromRows(rows: List<List<Double>>): Matrix = ListMatrix(rows)
 
     private fun constructor() = ListMatrix(emptyList())
     private fun constructor(cells: List<Double>, columnCount: Int) =

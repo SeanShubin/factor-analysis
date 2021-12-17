@@ -1,5 +1,6 @@
 package com.seanshubin.factor.analysis.matrix
 
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -57,6 +58,37 @@ class MatrixTest {
         val original = builder.addRow(0, 1).addRow(1, 0)
         val actual = original.reducedRowEchelonForm()
         val expected = builder.addRow(1, 0).addRow(0, 1)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun reducedRowEchelonFormForEmpty() {
+        val original = ListMatrix.empty
+        val actual = original.reducedRowEchelonForm()
+        assertEquals(original, actual)
+    }
+
+    @Test
+    fun reducedRowEchelonFormSwapZeroWithNonZeroLeadingEntryAfterFirst() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(1, 0, 0)
+            .addRow(0, 0, 1)
+            .addRow(0, 1, 0)
+        val actual = original.reducedRowEchelonForm()
+        val expected = builder
+            .addRow(1, 0, 0)
+            .addRow(0, 1, 0)
+            .addRow(0, 0, 1)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun subMatrix(){
+        val builder: Matrix = ListMatrix.empty
+        val original = builder.addRow(1,2,3,4).addRow(5,6,7,8).addRow(9,10,11,12)
+        val expected = builder.addRow(7,8).addRow(11,12)
+        val actual = original.subMatrix(1,2)
         assertEquals(expected, actual)
     }
 }
