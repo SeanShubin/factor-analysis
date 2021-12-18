@@ -10,6 +10,7 @@ class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
     }
 
     override fun fromRows(rows: List<List<Double>>): Matrix = ListMatrix(rows)
+    override fun toEmpty(): Matrix = empty
 
     private fun constructor() = ListMatrix(emptyList())
     private fun constructor(cells: List<Double>, columnCount: Int) =
@@ -44,6 +45,12 @@ class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
         val rowA = rows[rowIndexA]
         val rowB = rows[rowIndexB]
         return replaceRow(rowIndexA, rowB).replaceRow(rowIndexB, rowA)
+    }
+
+    override fun unaryOperation(operation: (Double) -> Double): Matrix {
+        val cells: List<Double> = toList().map(operation)
+        val result = constructor(cells, columnCount)
+        return result
     }
 
     override fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix {

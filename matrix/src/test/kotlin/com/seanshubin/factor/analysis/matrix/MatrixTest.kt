@@ -1,6 +1,8 @@
 package com.seanshubin.factor.analysis.matrix
 
-import kotlin.test.Ignore
+import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -80,6 +82,21 @@ class MatrixTest {
             .addRow(1, 0, 0)
             .addRow(0, 1, 0)
             .addRow(0, 0, 1)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun inverse() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(1, 1, -3)
+            .addRow(2, 5, 1)
+            .addRow(1, 3, 2)
+        val expected = builder
+            .addRow(7, -11, 16)
+            .addRow(-3, 5, -7)
+            .addRow(1, -2, 3)
+        val actual = original.inverse()?.round(13)
         assertEquals(expected, actual)
     }
 }
