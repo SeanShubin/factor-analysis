@@ -123,20 +123,21 @@ interface Matrix {
         return result
     }
 
-    fun round(scale:Int):Matrix {
+    fun round(scale: Int): Matrix {
         val roundFunction = createRoundFunction(scale)
         val result = unaryOperation(roundFunction)
         return result
     }
 
-    companion object{
-        fun createRoundFunction(scale:Int):(Double)->Double {
-            fun roundFunction(x:Double):Double {
+    companion object {
+        fun createRoundFunction(scale: Int): (Double) -> Double {
+            fun roundFunction(x: Double): Double {
                 return BigDecimal.valueOf(x).setScale(scale, RoundingMode.HALF_UP).toDouble()
             }
             return ::roundFunction
         }
     }
+
     private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix {
         val result = if (columnIndex < columnCount && rowIndex < rowCount) {
             if (columnAllZeroes(columnIndex)) {

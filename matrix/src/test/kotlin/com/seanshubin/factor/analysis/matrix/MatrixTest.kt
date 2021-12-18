@@ -1,8 +1,5 @@
 package com.seanshubin.factor.analysis.matrix
 
-import java.math.BigDecimal
-import java.math.MathContext
-import java.math.RoundingMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -104,8 +101,8 @@ class MatrixTest {
     fun noInverse() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
-            .addRow(3,4)
-            .addRow(6,8)
+            .addRow(3, 4)
+            .addRow(6, 8)
         val expected = null
         val actual = original.inverse()
         assertEquals(expected, actual)

@@ -59,8 +59,12 @@ class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
         return result
     }
 
-    override fun crossOperation(that: Matrix, operation1: (Double, Double) -> Double, operation2: (Double, Double) -> Double): Matrix {
-        if(columnCount != that.rowCount) {
+    override fun crossOperation(
+        that: Matrix,
+        operation1: (Double, Double) -> Double,
+        operation2: (Double, Double) -> Double
+    ): Matrix {
+        if (columnCount != that.rowCount) {
             throw RuntimeException(
                 """Column count ($columnCount) of this matrix does not match the row count (${that.rowCount} of that matrix)
                     |this matrix
@@ -81,14 +85,16 @@ class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
     }
 
     override fun replaceRow(rowIndex: Int, cells: List<Double>): Matrix {
-        return ListMatrix(rows.take(rowIndex) + listOf(cells) + rows.drop(rowIndex+1))
+        return ListMatrix(rows.take(rowIndex) + listOf(cells) + rows.drop(rowIndex + 1))
     }
 
-    private fun dotProduct(listA:List<Double>,
-                           listB:List<Double>,
-                           operation1: (Double, Double) -> Double,
-                           operation2: (Double, Double) -> Double):Double {
-        return listA.zip(listB).map { (a,b )-> operation2(a,b)}.fold(0.0, operation1)
+    private fun dotProduct(
+        listA: List<Double>,
+        listB: List<Double>,
+        operation1: (Double, Double) -> Double,
+        operation2: (Double, Double) -> Double
+    ): Double {
+        return listA.zip(listB).map { (a, b) -> operation2(a, b) }.fold(0.0, operation1)
     }
 
     override fun toString(): String = toLines().joinToString("\n")
