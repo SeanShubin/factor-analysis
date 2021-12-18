@@ -99,4 +99,15 @@ class MatrixTest {
         val actual = original.inverse()?.round(13)
         assertEquals(expected, actual)
     }
+
+    @Test
+    fun noInverse() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(3,4)
+            .addRow(6,8)
+        val expected = null
+        val actual = original.inverse()
+        assertEquals(expected, actual)
+    }
 }
