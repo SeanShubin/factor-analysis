@@ -107,4 +107,21 @@ class MatrixTest {
         val actual = original.inverse()
         assertEquals(expected, actual)
     }
+
+    @Test
+    fun transpose() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(1, -1, 2, -1, -1)
+            .addRow(-2, 1, 1, 1, -1)
+            .addRow(3, -1, 2, -2, -2)
+        val expected = builder
+            .addRow(1, -2,3)
+            .addRow(-1,1,-1)
+            .addRow(2,1,2)
+            .addRow(-1,1,-2)
+            .addRow(-1,-1,-2)
+        val actual = original.transpose()
+        assertEquals(expected, actual)
+    }
 }

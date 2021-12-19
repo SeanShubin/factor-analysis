@@ -129,6 +129,15 @@ interface Matrix {
         return result
     }
 
+    fun transpose(): Matrix {
+        val result = (0 until columnCount).map { columnIndex ->
+            (0 until rowCount).map { rowIndex ->
+                this[rowIndex, columnIndex]
+            }
+        }
+        return fromRows(result)
+    }
+
     companion object {
         fun createRoundFunction(scale: Int): (Double) -> Double {
             fun roundFunction(x: Double): Double {
