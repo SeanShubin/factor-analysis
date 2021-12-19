@@ -3,6 +3,7 @@ package com.seanshubin.factor.analysis.matrix
 import com.seanshubin.factor.analysis.format.RowStyleTableFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlin.time.toDuration
 
 interface Matrix {
     val rowCount: Int
@@ -45,6 +46,10 @@ interface Matrix {
     fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toDouble() }.toDoubleArray())
     operator fun plus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a + b }
     operator fun times(that: Matrix): Matrix = crossOperation(that, { a, b -> a + b }, { a, b -> a * b })
+    operator fun times(scalar:Double):Matrix = unaryOperation { it * scalar }
+    operator fun times(scalar:Int):Matrix = times(scalar.toDouble())
+    operator fun div(scalar:Double):Matrix = times(1/scalar)
+    operator fun div(scalar:Int):Matrix = div(scalar.toDouble())
     fun getRow(rowIndex: Int): List<Double> = (0 until columnCount).map { this[rowIndex, it] }
     fun getColumn(columnIndex: Int): List<Double> = (0 until rowCount).map { this[it, columnIndex] }
     fun multiplyRowBy(rowIndex: Int, x: Double): Matrix {
@@ -136,6 +141,11 @@ interface Matrix {
             }
         }
         return fromRows(result)
+    }
+
+    fun covariance():Matrix {
+        val result = this * this.transpose() / columnCount
+        return result
     }
 
     companion object {
