@@ -40,9 +40,9 @@
   }
   global [ stdlib test ]
   modules {
-    domain          [ contract matrix ratio ]
+    domain          [ contract matrix ]
     contract        []
-    matrix          [ format ]
+    matrix          [ format ratio ]
     format          []
     ratio           []
   }

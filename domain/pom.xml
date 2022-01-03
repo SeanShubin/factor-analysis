@@ -15,11 +15,6 @@
             <artifactId>factor-analysis-matrix</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.seanshubin.factor.analysis</groupId>
-            <artifactId>factor-analysis-ratio</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <parent>
         <groupId>com.seanshubin.factor.analysis</groupId>

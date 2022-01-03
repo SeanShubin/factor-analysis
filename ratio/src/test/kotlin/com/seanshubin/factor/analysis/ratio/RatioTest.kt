@@ -3,7 +3,6 @@ package com.seanshubin.factor.analysis.ratio
 import kotlin.test.assertEquals
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class RatioTest {
     @Test

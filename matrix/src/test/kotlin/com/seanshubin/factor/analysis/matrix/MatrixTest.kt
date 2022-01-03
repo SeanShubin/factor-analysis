@@ -1,5 +1,6 @@
 package com.seanshubin.factor.analysis.matrix
 
+import com.seanshubin.factor.analysis.ratio.Ratio
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -93,7 +94,7 @@ class MatrixTest {
             .addRow(7, -11, 16)
             .addRow(-3, 5, -7)
             .addRow(1, -2, 3)
-        val actual = original.inverse()?.round(13)
+        val actual = original.inverse()
         assertEquals(expected, actual)
     }
 
@@ -133,10 +134,10 @@ class MatrixTest {
             .addRow(-2, 1, 1, 1, -1)
             .addRow(3, -1, 2, -2, -2)
         val expected = builder
-            .addRow(1.6, -0.2, 2.4)
-            .addRow(-0.2, 1.6, -1.0)
-            .addRow(2.4, -1.0, 4.4)
-        val actual = original.covariance().round(14)
+            .addRow(Ratio(8,5), Ratio(-1,5), Ratio(12,5))
+            .addRow(Ratio(-1,5), Ratio(8,5), Ratio(-1,1))
+            .addRow(Ratio(12,5), Ratio(-1,1), Ratio(22,5))
+        val actual = original.covariance()
         assertEquals(expected, actual)
     }
 }
