@@ -3,7 +3,6 @@ package com.seanshubin.factor.analysis.matrix
 import com.seanshubin.factor.analysis.format.RowStyleTableFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.time.toDuration
 
 interface Matrix {
     val rowCount: Int
@@ -143,9 +142,13 @@ interface Matrix {
         return fromRows(result)
     }
 
-    fun covariance():Matrix {
+    fun covariance(): Matrix {
         val result = this * this.transpose() / columnCount
         return result
+    }
+
+    fun resizeToColumns(columnCount: Int): Matrix {
+        return ListMatrix(toList().chunked(columnCount))
     }
 
     companion object {
