@@ -1,6 +1,8 @@
 package com.seanshubin.factor.analysis.matrix
 
 import com.seanshubin.factor.analysis.ratio.Ratio
+import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ONE
+import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ZERO
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -84,6 +86,34 @@ class MatrixTest {
     }
 
     @Test
+    fun reducedRowEchelonFormForNonInvertibleMatrix() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(3, 4, 1, 0)
+            .addRow(6, 8, 0, 1)
+        val actual = original.reducedRowEchelonForm()
+        val expected = builder
+            .addRow(ONE, Ratio(4, 3), ZERO, Ratio(1,6))
+            .addRow(ZERO, ZERO, ONE, Ratio(-1, 2))
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun reducedRowEchelonFormLongExample() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(0, 3, -6, 6, 4, -5)
+            .addRow(3, -7, 8, -5, 8, 9)
+            .addRow(3, -9, 12, -9, 6, 15)
+        val actual = original.reducedRowEchelonForm()
+        val expected = builder
+            .addRow(1, 0, -2, 3, 0, -24)
+            .addRow(0, 1, -2, 2, 0, -7)
+            .addRow(0, 0, 0, 0, 1, 4)
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun inverse() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
@@ -134,77 +164,77 @@ class MatrixTest {
             .addRow(-2, 1, 1, 1, -1)
             .addRow(3, -1, 2, -2, -2)
         val expected = builder
-            .addRow(Ratio(8,5), Ratio(-1,5), Ratio(12,5))
-            .addRow(Ratio(-1,5), Ratio(8,5), Ratio(-1,1))
-            .addRow(Ratio(12,5), Ratio(-1,1), Ratio(22,5))
+            .addRow(Ratio(8, 5), Ratio(-1, 5), Ratio(12, 5))
+            .addRow(Ratio(-1, 5), Ratio(8, 5), Ratio(-1, 1))
+            .addRow(Ratio(12, 5), Ratio(-1, 1), Ratio(22, 5))
         val actual = original.covariance()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun determinant1(){
+    fun determinant1() {
         val builder: Matrix = ListMatrix.empty
         val original = builder.addRow(123)
-        val expected = Ratio(123,1)
+        val expected = Ratio(123, 1)
         val actual = original.determinant()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun determinant2(){
+    fun determinant2() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
-            .addRow(3,8)
-            .addRow(4,6)
-        val expected = Ratio(-14,1)
+            .addRow(3, 8)
+            .addRow(4, 6)
+        val expected = Ratio(-14, 1)
         val actual = original.determinant()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun determinant3(){
+    fun determinant3() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
-            .addRow(6,1,1)
-            .addRow(4,-2,5)
-            .addRow(2,8,7)
-        val expected = Ratio(-306,1)
+            .addRow(6, 1, 1)
+            .addRow(4, -2, 5)
+            .addRow(2, 8, 7)
+        val expected = Ratio(-306, 1)
         val actual = original.determinant()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun cofactor(){
+    fun cofactor() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
-            .addRow(3,1,-6)
-            .addRow(5,2,-1)
-            .addRow(-4,3,0)
+            .addRow(3, 1, -6)
+            .addRow(5, 2, -1)
+            .addRow(-4, 3, 0)
         val expected = builder
-            .addRow(3,4,23)
-            .addRow(-18,-24,-13)
-            .addRow(11,-27,1)
+            .addRow(3, 4, 23)
+            .addRow(-18, -24, -13)
+            .addRow(11, -27, 1)
         val actual = original.cofactor()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun adjugate(){
+    fun adjugate() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
-            .addRow(3,1,-6)
-            .addRow(5,2,-1)
-            .addRow(-4,3,0)
+            .addRow(3, 1, -6)
+            .addRow(5, 2, -1)
+            .addRow(-4, 3, 0)
         val expected = builder
-            .addRow(3,-18,11)
-            .addRow(4,-24,-27)
-            .addRow(23,-13,1)
+            .addRow(3, -18, 11)
+            .addRow(4, -24, -27)
+            .addRow(23, -13, 1)
         val actual = original.adjugate()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun inverse2() {
+    fun inverseCramersRule() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
             .addRow(1, 1, -3)
@@ -214,18 +244,18 @@ class MatrixTest {
             .addRow(7, -11, 16)
             .addRow(-3, 5, -7)
             .addRow(1, -2, 3)
-        val actual = original.inverse2()
+        val actual = original.inverseCramersRule()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun noInverse2() {
+    fun noInverseCramersRule() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
             .addRow(3, 4)
             .addRow(6, 8)
         val expected = null
-        val actual = original.inverse2()
+        val actual = original.inverseCramersRule()
         assertEquals(expected, actual)
     }
 }

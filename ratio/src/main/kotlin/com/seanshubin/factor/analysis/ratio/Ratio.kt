@@ -23,7 +23,7 @@ data class Ratio(val numerator: Int, val denominator: Int) : Comparable<Ratio> {
         return (numerator * lcm / denominator).compareTo(that.numerator * lcm / that.denominator)
     }
 
-    override fun toString(): String = "$numerator/$denominator"
+    override fun toString(): String = if(denominator == 1) "$numerator" else "$numerator/$denominator"
 
     fun simplify(): Ratio = simplifyFactor().simplifySign()
     private fun simplifySign(): Ratio =

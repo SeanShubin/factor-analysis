@@ -4,10 +4,10 @@ import com.seanshubin.factor.analysis.format.RowStyleTableFormatter
 import com.seanshubin.factor.analysis.ratio.Ratio
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ONE
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ZERO
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatio
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatioArray
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.div
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.sum
+import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatio
+import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatioArray
 
 interface Matrix {
     val rowCount: Int
@@ -50,10 +50,10 @@ interface Matrix {
     fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toRatio() }.toRatioArray())
     operator fun plus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a + b }
     operator fun times(that: Matrix): Matrix = crossOperation(that, { a, b -> a + b }, { a, b -> a * b })
-    operator fun times(scalar:Ratio):Matrix = unaryOperation { it * scalar }
-    operator fun times(scalar:Int):Matrix = times(scalar.toRatio())
-    operator fun div(scalar:Ratio):Matrix = times(1 / scalar)
-    operator fun div(scalar:Int):Matrix = div(scalar.toRatio())
+    operator fun times(scalar: Ratio): Matrix = unaryOperation { it * scalar }
+    operator fun times(scalar: Int): Matrix = times(scalar.toRatio())
+    operator fun div(scalar: Ratio): Matrix = times(1 / scalar)
+    operator fun div(scalar: Int): Matrix = div(scalar.toRatio())
     fun getRow(rowIndex: Int): List<Ratio> = (0 until columnCount).map { this[rowIndex, it] }
     fun getColumn(columnIndex: Int): List<Ratio> = (0 until rowCount).map { this[it, columnIndex] }
     fun multiplyRowBy(rowIndex: Int, x: Ratio): Matrix {
@@ -149,61 +149,63 @@ interface Matrix {
         return ListMatrix(toList().chunked(columnCount))
     }
 
-    fun isSquare():Boolean = rowCount == columnCount
+    fun isSquare(): Boolean = rowCount == columnCount
 
-    fun determinant():Ratio {
-        require(isSquare()){
+    fun determinant(): Ratio {
+        require(isSquare()) {
             "Determinant only applies to a square matrix"
         }
-        if(rowCount == 1) return this[0,0]
+        if (rowCount == 1) return this[0, 0]
         return (0 until rowCount).map {
             val sign = if (it % 2 == 0) 1 else -1
             this[0, it] * minor(0, it).determinant() * sign
         }.sum()
     }
 
-    fun minor(rowIndex:Int, columnIndex:Int):Matrix {
+    fun minor(rowIndex: Int, columnIndex: Int): Matrix {
         val rows = (0 until rowCount).filter { rowIndex != it }.map { r ->
-            (0 until columnCount).filter { columnIndex != it}.map { c ->
+            (0 until columnCount).filter { columnIndex != it }.map { c ->
                 this[r, c]
             }
         }
         return fromRows(rows)
     }
 
-    fun cofactor():Matrix {
+    fun cofactor(): Matrix {
         val rows = (0 until rowCount).map { rowIndex ->
             (0 until columnCount).map { columnIndex ->
-                val sign = if((rowIndex * rowCount + columnIndex) % 2 == 0) 1 else -1
+                val sign = if ((rowIndex * rowCount + columnIndex) % 2 == 0) 1 else -1
                 this.minor(rowIndex, columnIndex).determinant() * sign
             }
         }
         return fromRows(rows)
     }
 
-    fun adjugate():Matrix = cofactor().transpose()
+    fun adjugate(): Matrix = cofactor().transpose()
 
-    fun inverse2():Matrix? {
+    fun inverseCramersRule(): Matrix? {
         val determinant = determinant()
-        return if(determinant == ZERO) null else adjugate() / determinant
+        return if (determinant == ZERO) null else adjugate() / determinant
     }
 
-    private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix {
-        val result = if (columnIndex < columnCount && rowIndex < rowCount) {
+    private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix =
+        if (columnIndex < columnCount && rowIndex < rowCount) {
             if (columnAllZeroes(columnIndex)) {
                 reducedRowEchelonForm(rowIndex, columnIndex + 1)
             } else {
                 val a = moveRowsWithZeroToBottom(rowIndex, columnIndex)
-                val b = a.makeLeadingCoefficientOne(rowIndex, columnIndex)
-                val c = b.zeroOutOtherRows(rowIndex, columnIndex)
-                val d = c.reducedRowEchelonForm(rowIndex + 1, columnIndex + 1)
-                return d
+                if (a[rowIndex, columnIndex] == ZERO) {
+                    a.reducedRowEchelonForm(rowIndex, columnIndex + 1)
+                } else {
+                    val b = a.makeLeadingCoefficientOne(rowIndex, columnIndex)
+                    val c = b.zeroOutOtherRows(rowIndex, columnIndex)
+                    val d = c.reducedRowEchelonForm(rowIndex + 1, columnIndex + 1)
+                    d
+                }
             }
         } else {
             this
         }
-        return result
-    }
 
     private fun columnAllZeroes(columnIndex: Int): Boolean = (0 until rowCount).all { this[it, columnIndex] == ZERO }
     private fun moveRowsWithZeroToBottom(rowIndex: Int, columnIndex: Int): Matrix {
@@ -226,12 +228,7 @@ interface Matrix {
 
     private fun makeLeadingCoefficientOne(rowIndex: Int, columnIndex: Int): Matrix {
         val denominator = this[rowIndex, columnIndex]
-        if(denominator == ZERO) {
-            return this
-        } else {
-            val result = divideRowBy(rowIndex, this[rowIndex, columnIndex])
-            return result
-        }
+        return divideRowBy(rowIndex, denominator)
     }
 
     private fun zeroOutOtherRows(rowIndex: Int, columnIndex: Int): Matrix {
@@ -240,10 +237,8 @@ interface Matrix {
             if (it != rowIndex) {
                 val numerator = this[it, columnIndex]
                 val denominator = this[rowIndex, columnIndex]
-                if(denominator != ZERO){
-                    val multiple = numerator / denominator
-                    result = result.subtractMultipleOfRow(it, rowIndex, multiple)
-                }
+                val multiple = numerator / denominator
+                result = result.subtractMultipleOfRow(it, rowIndex, multiple)
             }
         }
         return result
