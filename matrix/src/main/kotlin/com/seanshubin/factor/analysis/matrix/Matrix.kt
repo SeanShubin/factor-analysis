@@ -7,8 +7,7 @@ import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ZERO
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatio
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatioArray
 import com.seanshubin.factor.analysis.ratio.Ratio.Companion.div
-import java.math.BigDecimal
-import java.math.RoundingMode
+import com.seanshubin.factor.analysis.ratio.Ratio.Companion.sum
 
 interface Matrix {
     val rowCount: Int
@@ -148,6 +147,45 @@ interface Matrix {
 
     fun resizeToColumns(columnCount: Int): Matrix {
         return ListMatrix(toList().chunked(columnCount))
+    }
+
+    fun isSquare():Boolean = rowCount == columnCount
+
+    fun determinant():Ratio {
+        require(isSquare()){
+            "Determinant only applies to a square matrix"
+        }
+        if(rowCount == 1) return this[0,0]
+        return (0 until rowCount).map {
+            val sign = if (it % 2 == 0) 1 else -1
+            this[0, it] * minor(0, it).determinant() * sign
+        }.sum()
+    }
+
+    fun minor(rowIndex:Int, columnIndex:Int):Matrix {
+        val rows = (0 until rowCount).filter { rowIndex != it }.map { r ->
+            (0 until columnCount).filter { columnIndex != it}.map { c ->
+                this[r, c]
+            }
+        }
+        return fromRows(rows)
+    }
+
+    fun cofactor():Matrix {
+        val rows = (0 until rowCount).map { rowIndex ->
+            (0 until columnCount).map { columnIndex ->
+                val sign = if((rowIndex * rowCount + columnIndex) % 2 == 0) 1 else -1
+                this.minor(rowIndex, columnIndex).determinant() * sign
+            }
+        }
+        return fromRows(rows)
+    }
+
+    fun adjugate():Matrix = cofactor().transpose()
+
+    fun inverse2():Matrix? {
+        val determinant = determinant()
+        return if(determinant == ZERO) null else adjugate() / determinant
     }
 
     private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix {

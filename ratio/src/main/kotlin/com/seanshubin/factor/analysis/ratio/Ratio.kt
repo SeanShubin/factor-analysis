@@ -13,6 +13,7 @@ data class Ratio(val numerator: Int, val denominator: Int) : Comparable<Ratio> {
 
     operator fun minus(that: Ratio): Ratio = (this + -that).simplify()
     operator fun times(that: Ratio): Ratio = Ratio(numerator * that.numerator, denominator * that.denominator).simplify()
+    operator fun times(that: Int): Ratio = this * Ratio(that,1)
     operator fun div(that: Ratio): Ratio = (this * that.recriprocal()).simplify()
     operator fun unaryMinus(): Ratio = Ratio(-numerator, denominator).simplify()
     fun recriprocal(): Ratio = Ratio(denominator, numerator).simplify()
@@ -57,6 +58,13 @@ data class Ratio(val numerator: Int, val denominator: Int) : Comparable<Ratio> {
         fun Int.toRatio():Ratio = Ratio(this, 1)
         fun List<Ratio>.toRatioArray():Array<Ratio> = toTypedArray()
         operator fun Int.div(x:Ratio):Ratio = ONE / x
+        fun List<Ratio>.sum():Ratio {
+                var sum: Ratio = ZERO
+                for (element in this) {
+                    sum += element
+                }
+                return sum
+        }
     }
 
     val toDouble: Double get() = numerator.toDouble() / denominator.toDouble()
