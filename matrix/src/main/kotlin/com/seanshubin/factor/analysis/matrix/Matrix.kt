@@ -190,18 +190,14 @@ interface Matrix {
 
     private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix =
         if (columnIndex < columnCount && rowIndex < rowCount) {
-            if (columnAllZeroes(columnIndex)) {
-                reducedRowEchelonForm(rowIndex, columnIndex + 1)
+            val a = moveRowsWithZeroToBottom(rowIndex, columnIndex)
+            if (a[rowIndex, columnIndex] == ZERO) {
+                a.reducedRowEchelonForm(rowIndex, columnIndex + 1)
             } else {
-                val a = moveRowsWithZeroToBottom(rowIndex, columnIndex)
-                if (a[rowIndex, columnIndex] == ZERO) {
-                    a.reducedRowEchelonForm(rowIndex, columnIndex + 1)
-                } else {
-                    val b = a.makeLeadingCoefficientOne(rowIndex, columnIndex)
-                    val c = b.zeroOutOtherRows(rowIndex, columnIndex)
-                    val d = c.reducedRowEchelonForm(rowIndex + 1, columnIndex + 1)
-                    d
-                }
+                val b = a.makeLeadingCoefficientOne(rowIndex, columnIndex)
+                val c = b.zeroOutOtherRows(rowIndex, columnIndex)
+                val d = c.reducedRowEchelonForm(rowIndex + 1, columnIndex + 1)
+                d
             }
         } else {
             this
