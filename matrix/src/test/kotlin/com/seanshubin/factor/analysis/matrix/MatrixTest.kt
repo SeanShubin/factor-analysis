@@ -249,7 +249,7 @@ class MatrixTest {
     }
 
     @Test
-    fun noInverseCramersRule() {
+    fun inverseCramersRuleNoSolution() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
             .addRow(3, 4)
