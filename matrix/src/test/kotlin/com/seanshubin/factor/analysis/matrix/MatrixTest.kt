@@ -258,4 +258,7 @@ class MatrixTest {
         val actual = original.inverseCramersRule()
         assertEquals(expected, actual)
     }
+
+    // correlation coefficients
+    // https://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/#Pearson
 }
