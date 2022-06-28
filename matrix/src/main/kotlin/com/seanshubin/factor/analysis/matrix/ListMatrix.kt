@@ -1,9 +1,8 @@
 package com.seanshubin.factor.analysis.matrix
 
-import com.seanshubin.factor.analysis.ratio.Ratio
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ZERO
+import com.seanshubin.factor.analysis.matrix.Matrix.Companion.ZERO
 
-class ListMatrix constructor(private val rows: List<List<Ratio>>) : Matrix {
+class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
     companion object {
         val empty: Matrix = ListMatrix(emptyList())
     }
@@ -12,11 +11,11 @@ class ListMatrix constructor(private val rows: List<List<Ratio>>) : Matrix {
         requireAllRowsSameSize()
     }
 
-    override fun fromRows(rows: List<List<Ratio>>): Matrix = ListMatrix(rows)
+    override fun fromRows(rows: List<List<Double>>): Matrix = ListMatrix(rows)
     override fun toEmpty(): Matrix = empty
 
     private fun constructor() = ListMatrix(emptyList())
-    private fun constructor(cells: List<Ratio>, columnCount: Int) =
+    private fun constructor(cells: List<Double>, columnCount: Int) =
         if (cells.isEmpty() && columnCount == 0) constructor()
         else ListMatrix(cells.chunked(columnCount))
 
@@ -30,12 +29,12 @@ class ListMatrix constructor(private val rows: List<List<Ratio>>) : Matrix {
 
     override val rowCount: Int get() = rows.size
     override val columnCount: Int get() = if (rowCount == 0) 0 else rows[0].size
-    override fun get(i: Int, j: Int): Ratio = rows[i][j]
-    override fun addRow(vararg cells: Ratio): Matrix = ListMatrix(rows + listOf(cells.toList()))
+    override fun get(i: Int, j: Int): Double = rows[i][j]
+    override fun addRow(vararg cells: Double): Matrix = ListMatrix(rows + listOf(cells.toList()))
 
-    override fun addColumn(vararg cells: Ratio): Matrix {
-        fun appendCell(row: List<Ratio>, cell: Ratio): List<Ratio> = row + cell
-        fun appendCell(rowAndCell: Pair<List<Ratio>, Ratio>): List<Ratio> =
+    override fun addColumn(vararg cells: Double): Matrix {
+        fun appendCell(row: List<Double>, cell: Double): List<Double> = row + cell
+        fun appendCell(rowAndCell: Pair<List<Double>, Double>): List<Double> =
             appendCell(rowAndCell.first, rowAndCell.second)
 
         val baseRows = rows.ifEmpty {
@@ -50,22 +49,22 @@ class ListMatrix constructor(private val rows: List<List<Ratio>>) : Matrix {
         return replaceRow(rowIndexA, rowB).replaceRow(rowIndexB, rowA)
     }
 
-    override fun unaryOperation(operation: (Ratio) -> Ratio): Matrix {
-        val cells: List<Ratio> = toList().map(operation)
+    override fun unaryOperation(operation: (Double) -> Double): Matrix {
+        val cells: List<Double> = toList().map(operation)
         val result = constructor(cells, columnCount)
         return result
     }
 
-    override fun binaryOperation(that: Matrix, operation: (Ratio, Ratio) -> Ratio): Matrix {
-        val cells: List<Ratio> = toList().zip(that.toList()).map { (a, b) -> operation(a, b) }
+    override fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix {
+        val cells: List<Double> = toList().zip(that.toList()).map { (a, b) -> operation(a, b) }
         val result = constructor(cells, columnCount)
         return result
     }
 
     override fun crossOperation(
         that: Matrix,
-        operation1: (Ratio, Ratio) -> Ratio,
-        operation2: (Ratio, Ratio) -> Ratio
+        operation1: (Double, Double) -> Double,
+        operation2: (Double, Double) -> Double
     ): Matrix {
         if (columnCount != that.rowCount) {
             throw RuntimeException(
@@ -87,16 +86,16 @@ class ListMatrix constructor(private val rows: List<List<Ratio>>) : Matrix {
         return ListMatrix(rows)
     }
 
-    override fun replaceRow(rowIndex: Int, cells: List<Ratio>): Matrix {
+    override fun replaceRow(rowIndex: Int, cells: List<Double>): Matrix {
         return ListMatrix(rows.take(rowIndex) + listOf(cells) + rows.drop(rowIndex + 1))
     }
 
     private fun dotProduct(
-        listA: List<Ratio>,
-        listB: List<Ratio>,
-        operation1: (Ratio, Ratio) -> Ratio,
-        operation2: (Ratio, Ratio) -> Ratio
-    ): Ratio {
+        listA: List<Double>,
+        listB: List<Double>,
+        operation1: (Double, Double) -> Double,
+        operation2: (Double, Double) -> Double
+    ): Double {
         return listA.zip(listB).map { (a, b) -> operation2(a, b) }.fold(ZERO, operation1)
     }
 

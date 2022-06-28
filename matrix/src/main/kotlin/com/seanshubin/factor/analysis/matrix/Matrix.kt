@@ -1,33 +1,28 @@
 package com.seanshubin.factor.analysis.matrix
 
 import com.seanshubin.factor.analysis.format.RowStyleTableFormatter
-import com.seanshubin.factor.analysis.ratio.Ratio
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ONE
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.ZERO
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.div
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.sum
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatio
-import com.seanshubin.factor.analysis.ratio.Ratio.Companion.toRatioArray
+import kotlin.math.abs
 
 interface Matrix {
     val rowCount: Int
     val columnCount: Int
-    operator fun get(i: Int, j: Int): Ratio
+    operator fun get(i: Int, j: Int): Double
     fun toEmpty(): Matrix
-    fun addRow(vararg cells: Ratio): Matrix
-    fun addColumn(vararg cells: Ratio): Matrix
-    fun fromRows(rows: List<List<Ratio>>): Matrix
-    fun replaceRow(rowIndex: Int, cells: List<Ratio>): Matrix
+    fun addRow(vararg cells: Double): Matrix
+    fun addColumn(vararg cells: Double): Matrix
+    fun fromRows(rows: List<List<Double>>): Matrix
+    fun replaceRow(rowIndex: Int, cells: List<Double>): Matrix
     fun swapRows(rowIndexA: Int, rowIndexB: Int): Matrix
-    fun unaryOperation(operation: (Ratio) -> Ratio): Matrix
-    fun binaryOperation(that: Matrix, operation: (Ratio, Ratio) -> Ratio): Matrix
+    fun unaryOperation(operation: (Double) -> Double): Matrix
+    fun binaryOperation(that: Matrix, operation: (Double, Double) -> Double): Matrix
     fun crossOperation(
         that: Matrix,
-        operation1: (Ratio, Ratio) -> Ratio,
-        operation2: (Ratio, Ratio) -> Ratio
+        operation1: (Double, Double) -> Double,
+        operation2: (Double, Double) -> Double
     ): Matrix
+    val size:List<Int> get() = listOf(rowCount, columnCount)
 
-    fun toList(): List<Ratio> {
+    fun toList(): List<Double> {
         val list = (0 until rowCount).flatMap { rowIndex ->
             (0 until columnCount).map { columnIndex ->
                 this[rowIndex, columnIndex]
@@ -36,7 +31,7 @@ interface Matrix {
         return list
     }
 
-    fun toRows(): List<List<Ratio>> {
+    fun toRows(): List<List<Double>> {
         val rows = (0 until rowCount).map { rowIndex ->
             (0 until columnCount).map { columnIndex ->
                 this[rowIndex, columnIndex]
@@ -46,37 +41,37 @@ interface Matrix {
     }
 
     fun toLines(): List<String> = RowStyleTableFormatter.minimal.format(toRows())
-    fun addRow(vararg cells: Int): Matrix = addRow(*cells.map { it.toRatio() }.toRatioArray())
-    fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toRatio() }.toRatioArray())
+    fun addRow(vararg cells: Int): Matrix = addRow(*cells.map { it.toDouble() }.toDoubleArray())
+    fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toDouble() }.toDoubleArray())
     operator fun plus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a + b }
     operator fun times(that: Matrix): Matrix = crossOperation(that, { a, b -> a + b }, { a, b -> a * b })
-    operator fun times(scalar: Ratio): Matrix = unaryOperation { it * scalar }
-    operator fun times(scalar: Int): Matrix = times(scalar.toRatio())
-    operator fun div(scalar: Ratio): Matrix = times(1 / scalar)
-    operator fun div(scalar: Int): Matrix = div(scalar.toRatio())
-    fun getRow(rowIndex: Int): List<Ratio> = (0 until columnCount).map { this[rowIndex, it] }
-    fun getColumn(columnIndex: Int): List<Ratio> = (0 until rowCount).map { this[it, columnIndex] }
-    fun multiplyRowBy(rowIndex: Int, x: Ratio): Matrix {
-        val newRow = (0 until columnCount).map { this[rowIndex, it] * x }
+    operator fun times(scalar: Double): Matrix = unaryOperation { it * scalar }
+    operator fun times(scalar: Int): Matrix = times(scalar.toDouble())
+    operator fun div(scalar: Double): Matrix = times(1 / scalar)
+    operator fun div(scalar: Int): Matrix = div(scalar.toDouble())
+    fun getRow(rowIndex: Int): List<Double> = (0 until columnCount).map { this[rowIndex, it] }
+    fun getColumn(columnIndex: Int): List<Double> = (0 until rowCount).map { this[it, columnIndex] }
+    fun multiplyRowBy(rowIndex: Int, x: Double): Matrix {
+        val newRow = (0 until columnCount).map { multiply(this[rowIndex, it], x) }
         return replaceRow(rowIndex, newRow)
     }
 
-    fun multiplyRowBy(rowIndex: Int, x: Int): Matrix = multiplyRowBy(rowIndex, x.toRatio())
-    fun divideRowBy(rowIndex: Int, x: Ratio): Matrix = multiplyRowBy(rowIndex, 1 / x)
-    fun divideRowBy(rowIndex: Int, x: Int): Matrix = divideRowBy(rowIndex, x.toRatio())
-    fun addMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Ratio): Matrix {
+    fun multiplyRowBy(rowIndex: Int, x: Int): Matrix = multiplyRowBy(rowIndex, x.toDouble())
+    fun divideRowBy(rowIndex: Int, x: Double): Matrix = multiplyRowBy(rowIndex, 1 / x)
+    fun divideRowBy(rowIndex: Int, x: Int): Matrix = divideRowBy(rowIndex, x.toDouble())
+    fun addMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Double): Matrix {
         val newRow = (0 until columnCount).map { this[targetRowIndex, it] + multiple * this[sourceRowIndex, it] }
         return replaceRow(targetRowIndex, newRow)
     }
 
     fun addMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Int): Matrix =
-        addMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toRatio())
+        addMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toDouble())
 
-    fun subtractMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Ratio): Matrix =
+    fun subtractMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Double): Matrix =
         addMultipleOfRow(targetRowIndex, sourceRowIndex, -multiple)
 
     fun subtractMultipleOfRow(targetRowIndex: Int, sourceRowIndex: Int, multiple: Int): Matrix =
-        subtractMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toRatio())
+        subtractMultipleOfRow(targetRowIndex, sourceRowIndex, multiple.toDouble())
 
     fun reducedRowEchelonForm(): Matrix = reducedRowEchelonForm(0, 0)
     fun inverse(): Matrix? {
@@ -105,7 +100,7 @@ interface Matrix {
         return (0 until rowCount).all { rowIndex ->
             (0 until columnCount).all { columnIndex ->
                 rowIndex == columnIndex && this[rowIndex, columnIndex] == ONE ||
-                        rowIndex != columnIndex && this[rowIndex, columnIndex] == ZERO
+                        rowIndex != columnIndex && closeToZero(this[rowIndex, columnIndex])
             }
         }
     }
@@ -118,14 +113,14 @@ interface Matrix {
 
     fun columnRange(begin: Int, end: Int): Matrix {
         val result = (begin until end).fold(toEmpty()) { current: Matrix, columnIndex: Int ->
-            current.addColumn(*getColumn(columnIndex).toRatioArray())
+            current.addColumn(*getColumn(columnIndex).toDoubleArray())
         }
         return result
     }
 
     fun addColumns(that: Matrix): Matrix {
         val result = (0 until that.columnCount).fold(this) { current: Matrix, columnIndex: Int ->
-            val column = that.getColumn(columnIndex).toRatioArray()
+            val column = that.getColumn(columnIndex).toDoubleArray()
             current.addColumn(*column)
         }
         return result
@@ -151,7 +146,7 @@ interface Matrix {
 
     fun isSquare(): Boolean = rowCount == columnCount
 
-    fun determinant(): Ratio {
+    fun determinant(): Double {
         require(isSquare()) {
             "Determinant only applies to a square matrix"
         }
@@ -185,13 +180,13 @@ interface Matrix {
 
     fun inverseCramersRule(): Matrix? {
         val determinant = determinant()
-        return if (determinant == ZERO) null else adjugate() / determinant
+        return if (closeToZero(determinant)) null else adjugate() / determinant
     }
 
     private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix =
         if (columnIndex < columnCount && rowIndex < rowCount) {
             val a = moveRowsWithZeroToBottom(rowIndex, columnIndex)
-            if (a[rowIndex, columnIndex] == ZERO) {
+            if (closeToZero(a[rowIndex, columnIndex])) {
                 a.reducedRowEchelonForm(rowIndex, columnIndex + 1)
             } else {
                 val b = a.makeLeadingCoefficientOne(rowIndex, columnIndex)
@@ -203,11 +198,11 @@ interface Matrix {
             this
         }
 
-    private fun columnAllZeroes(columnIndex: Int): Boolean = (0 until rowCount).all { this[it, columnIndex] == ZERO }
+    private fun columnAllZeroes(columnIndex: Int): Boolean = (0 until rowCount).all { closeToZero(this[it, columnIndex]) }
     private fun moveRowsWithZeroToBottom(rowIndex: Int, columnIndex: Int): Matrix {
         val result = if (rowIndex >= rowCount) {
             this
-        } else if (this[rowIndex, columnIndex] == ZERO) {
+        } else if (closeToZero(this[rowIndex, columnIndex])) {
             val nonZeroRowIndex = findNonZeroRowIndex(rowIndex + 1, columnIndex)
             if (nonZeroRowIndex == null) {
                 this
@@ -241,7 +236,15 @@ interface Matrix {
     }
 
     private fun findNonZeroRowIndex(rowIndex: Int, columnIndex: Int): Int? {
-        val resultIndex = (rowIndex until rowCount).indexOfFirst { this[it, columnIndex] != ZERO }
+        val resultIndex = (rowIndex until rowCount).indexOfFirst { !closeToZero(this[it, columnIndex]) }
         return if (resultIndex == -1) null else resultIndex + rowIndex
+    }
+    companion object{
+        val tolerance = 1.0e-13
+        val ZERO = 0.0
+        val ONE = 1.0
+        fun Double.noNegativeZero():Double = if(this == -0.0)  0.0 else  this
+        fun multiply(x:Double, y:Double):Double = (x * y).noNegativeZero()
+        fun closeToZero(x:Double):Boolean = abs(x) <= tolerance
     }
 }
