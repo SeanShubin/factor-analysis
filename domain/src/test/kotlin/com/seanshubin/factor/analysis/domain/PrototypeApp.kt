@@ -1,7 +1,7 @@
 package com.seanshubin.factor.analysis.domain
 
-import com.seanshubin.factor.analysis.format.RowStyleTableFormatter
 import com.seanshubin.factor.analysis.matrix.ListMatrix
+import com.seanshubin.factor.analysis.matrix.Matrix
 import kotlin.random.Random
 
 object PrototypeApp {
@@ -10,15 +10,14 @@ object PrototypeApp {
         val individuals = randomIndividuals()
         val observables = randomObservables()
         val observations = makeObservations(individuals, observables)
-        val lines = RowStyleTableFormatter.minimal.format(observations)
-        observables.forEach(::println)
-        lines.forEach(::println)
+        val correlationCoefficients = observations.correlationCoefficients()
+        println(correlationCoefficients)
     }
 
     val seed:Long = 12345L
     val random:Random = Random(seed)
     val factorCount = 3
-    val individualCount = 100
+    val individualCount = 1000
     val observableCountPerFactor = 3
 
     fun randomIndividuals():List<List<Double>> = (0 until individualCount).map{ randomIndividual() }
@@ -30,10 +29,10 @@ object PrototypeApp {
     fun randomObservablesForFactor(factorIndex:Int):List<Observable> = (0 until observableCountPerFactor).map(::randomObservable)
     fun randomObservables():List<Observable> = (0 until factorCount).flatMap(::randomObservablesForFactor)
 
-    fun makeObservations(individuals:List<List<Double>>, observables: List<Observable>):List<List<Double>> =
-        individuals.map{ individual ->
+    fun makeObservations(individuals:List<List<Double>>, observables: List<Observable>):Matrix =
+        ListMatrix.empty.fromRows(individuals.map{ individual ->
             observables.map { observable ->
                 observable.observe(individual)
             }
-        }
+        })
 }

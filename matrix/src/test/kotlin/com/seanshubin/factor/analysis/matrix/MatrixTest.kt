@@ -266,6 +266,23 @@ class MatrixTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun correlationCoefficients(){
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(43, 99)
+            .addRow(21, 65)
+            .addRow(25, 79)
+            .addRow(42, 75)
+            .addRow(57, 87)
+            .addRow(59, 81)
+        val actual = original.correlationCoefficients()
+        val expected = builder
+            .addRow(1.0, 0.5298089018901744)
+            .addRow(0.5298089018901744, 1.0)
+        assertEquals(expected, actual)
+    }
+
     private fun assertMatrixEquals(expected:Matrix?, actual:Matrix?){
         if(expected == null){
             if(actual != null){

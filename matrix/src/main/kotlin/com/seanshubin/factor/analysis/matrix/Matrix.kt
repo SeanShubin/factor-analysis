@@ -183,6 +183,38 @@ interface Matrix {
         return if (closeToZero(determinant)) null else adjugate() / determinant
     }
 
+    fun correlationCoefficients():Matrix{
+        val rows = (0 until columnCount).map { xIndex ->
+            val xs = getColumn(xIndex)
+            val sumX = xs.sum()
+            val sumXSquared = xs.sumSquares()
+            (0 until columnCount).map { yIndex ->
+                val ys = getColumn(yIndex)
+                val sumY = ys.sum()
+                val sumYSquared = ys.sumSquares()
+                val xy = xs * ys
+                val sumXy = xy.sum()
+                val numerator = rowCount * sumXy - sumX * sumY
+                val denominator = Math.sqrt(
+                    (rowCount * sumXSquared- sumX * sumX) *
+                    (rowCount * sumYSquared- sumY * sumY)
+                )
+                val correlationCoefficient = numerator / denominator
+                correlationCoefficient
+            }
+        }
+        return fromRows(rows)
+    }
+
+    private fun List<Double>.sumSquares() = sumOf { it * it }
+    private operator fun List<Double>.times(that:List<Double>):List<Double> {
+        require(this.size == that.size) {
+            "lists must be same size, got ${this.size} and ${that.size}"
+        }
+        return indices.map { this[it] * that[it] }
+    }
+
+
     private fun reducedRowEchelonForm(rowIndex: Int, columnIndex: Int): Matrix =
         if (columnIndex < columnCount && rowIndex < rowCount) {
             val a = moveRowsWithZeroToBottom(rowIndex, columnIndex)
