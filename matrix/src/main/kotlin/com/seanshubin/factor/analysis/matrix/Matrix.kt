@@ -22,6 +22,9 @@ interface Matrix {
     ): Matrix
     val size:List<Int> get() = listOf(rowCount, columnCount)
 
+    fun fromRow(row: List<Double>): Matrix = fromRows(listOf(row))
+    fun fromColumn(column: List<Double>): Matrix = fromRow(column).transpose()
+
     fun toList(): List<Double> {
         val list = (0 until rowCount).flatMap { rowIndex ->
             (0 until columnCount).map { columnIndex ->
@@ -44,13 +47,16 @@ interface Matrix {
     fun addRow(vararg cells: Int): Matrix = addRow(*cells.map { it.toDouble() }.toDoubleArray())
     fun addColumn(vararg cells: Int): Matrix = addColumn(*cells.map { it.toDouble() }.toDoubleArray())
     operator fun plus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a + b }
+    operator fun minus(that: Matrix): Matrix = binaryOperation(that) { a, b -> a - b }
     operator fun times(that: Matrix): Matrix = crossOperation(that, { a, b -> a + b }, { a, b -> a * b })
     operator fun times(scalar: Double): Matrix = unaryOperation { it * scalar }
     operator fun times(scalar: Int): Matrix = times(scalar.toDouble())
     operator fun div(scalar: Double): Matrix = times(1 / scalar)
     operator fun div(scalar: Int): Matrix = div(scalar.toDouble())
-    fun getRow(rowIndex: Int): List<Double> = (0 until columnCount).map { this[rowIndex, it] }
-    fun getColumn(columnIndex: Int): List<Double> = (0 until rowCount).map { this[it, columnIndex] }
+    fun getRowAsList(rowIndex: Int): List<Double> = (0 until columnCount).map { this[rowIndex, it] }
+    fun getColumnAsList(columnIndex: Int): List<Double> = (0 until rowCount).map { this[it, columnIndex] }
+    fun getRowAsMatrix(rowIndex: Int): Matrix = fromRow(getRowAsList(rowIndex))
+    fun getColumnAsMatrix(columnIndex: Int): Matrix = fromColumn(getColumnAsList(columnIndex))
     fun multiplyRowBy(rowIndex: Int, x: Double): Matrix {
         val newRow = (0 until columnCount).map { multiply(this[rowIndex, it], x) }
         return replaceRow(rowIndex, newRow)
@@ -113,14 +119,14 @@ interface Matrix {
 
     fun columnRange(begin: Int, end: Int): Matrix {
         val result = (begin until end).fold(toEmpty()) { current: Matrix, columnIndex: Int ->
-            current.addColumn(*getColumn(columnIndex).toDoubleArray())
+            current.addColumn(*getColumnAsList(columnIndex).toDoubleArray())
         }
         return result
     }
 
     fun addColumns(that: Matrix): Matrix {
         val result = (0 until that.columnCount).fold(this) { current: Matrix, columnIndex: Int ->
-            val column = that.getColumn(columnIndex).toDoubleArray()
+            val column = that.getColumnAsList(columnIndex).toDoubleArray()
             current.addColumn(*column)
         }
         return result
@@ -185,11 +191,11 @@ interface Matrix {
 
     fun correlationCoefficients():Matrix{
         val rows = (0 until columnCount).map { xIndex ->
-            val xs = getColumn(xIndex)
+            val xs = getColumnAsList(xIndex)
             val sumX = xs.sum()
             val sumXSquared = xs.sumSquares()
             (0 until columnCount).map { yIndex ->
-                val ys = getColumn(yIndex)
+                val ys = getColumnAsList(yIndex)
                 val sumY = ys.sum()
                 val sumYSquared = ys.sumSquares()
                 val xy = xs * ys

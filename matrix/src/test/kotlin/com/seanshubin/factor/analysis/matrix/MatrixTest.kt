@@ -1,8 +1,8 @@
 package com.seanshubin.factor.analysis.matrix
 
-import com.seanshubin.factor.analysis.ratio.Ratio
 import com.seanshubin.factor.analysis.matrix.Matrix.Companion.ONE
 import com.seanshubin.factor.analysis.matrix.Matrix.Companion.ZERO
+import com.seanshubin.factor.analysis.ratio.Ratio
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -100,7 +100,7 @@ class MatrixTest {
             .addRow(6, 8, 0, 1)
         val actual = original.reducedRowEchelonForm()
         val expected = builder
-            .addRow(ONE, Ratio(4, 3).toDouble, ZERO, Ratio(1,6).toDouble)
+            .addRow(ONE, Ratio(4, 3).toDouble, ZERO, Ratio(1, 6).toDouble)
             .addRow(ZERO, ZERO, ONE, Ratio(-1, 2).toDouble)
         assertEquals(expected, actual)
     }
@@ -267,7 +267,7 @@ class MatrixTest {
     }
 
     @Test
-    fun correlationCoefficients(){
+    fun correlationCoefficients() {
         val builder: Matrix = ListMatrix.empty
         val original = builder
             .addRow(43, 99)
@@ -283,19 +283,41 @@ class MatrixTest {
         assertEquals(expected, actual)
     }
 
-    private fun assertMatrixEquals(expected:Matrix?, actual:Matrix?){
-        if(expected == null){
-            if(actual != null){
+    @Test
+    fun correlationCoefficients2() {
+        val builder: Matrix = ListMatrix.empty
+        val original = builder
+            .addRow(6, 5, 4, 8, 6, 2)
+            .addRow(8, 7, 2, 7, 5, 3)
+            .addRow(9, 8, 1, 9, 7, 1)
+            .addRow(5, 4, 5, 9, 7, 1)
+            .addRow(4, 3, 6, 9, 7, 1)
+            .addRow(7, 6, 3, 7, 5, 3)
+            .addRow(3, 2, 7, 7, 5, 3)
+        val actual = original.correlationCoefficients()
+        val expected = builder
+            .addRow(1.0, 1.0, -1.0, 0.0, 0.0, 0.0)
+            .addRow(1.0, 1.0, -1.0, 0.0, 0.0, 0.0)
+            .addRow(-1.0, -1.0, 1.0, 0.0, 0.0, 0.0)
+            .addRow(0.0, 0.0, 0.0, 1.0, 1.0, -1.0)
+            .addRow(0.0, 0.0, 0.0, 1.0, 1.0, -1.0)
+            .addRow(0.0, 0.0, 0.0, -1.0, -1.0, 1.0)
+        assertEquals(expected, actual)
+    }
+
+    private fun assertMatrixEquals(expected: Matrix?, actual: Matrix?) {
+        if (expected == null) {
+            if (actual != null) {
                 fail("expected null")
             }
         } else {
-            if(actual == null){
+            if (actual == null) {
                 fail("actual was null")
             } else {
                 val tolerance = Matrix.tolerance
                 assertEquals(expected.size, actual.size)
                 for (i in 0 until expected.rowCount) {
-                    for(j in 0 until expected.columnCount){
+                    for (j in 0 until expected.columnCount) {
                         assertEquals(expected[i, j], actual[i, j], tolerance, "difference at [$i, $j]")
                     }
                 }

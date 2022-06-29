@@ -78,8 +78,8 @@ class ListMatrix constructor(private val rows: List<List<Double>>) : Matrix {
         }
         val rows = (0 until rowCount).map { rowIndex ->
             (0 until that.columnCount).map { columnIndex ->
-                val row = getRow(rowIndex)
-                val column = that.getColumn(columnIndex)
+                val row = getRowAsList(rowIndex)
+                val column = that.getColumnAsList(columnIndex)
                 dotProduct(row, column, operation1, operation2)
             }
         }
